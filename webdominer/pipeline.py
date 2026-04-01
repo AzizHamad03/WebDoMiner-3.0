@@ -1,17 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
 from webdominer.io.loader import load_rs_text
 from webdominer.io.writer import write_json, write_jsonl
 from webdominer.logging_utils import configure_logging, get_logger
-from webdominer.models import (
-    FailedPage,
-    PipelineSummary,
-    RejectedPage,
-)
+from webdominer.models import FailedPage, PipelineSummary, RejectedPage
 from webdominer.retrieval.discovery import UrlDiscoveryService
 from webdominer.retrieval.keywording import KeywordExtractor
 from webdominer.retrieval.query_builder import QueryBuilder
@@ -39,11 +34,6 @@ class WebDoMinerPipeline:
         self.search_client = create_search_client(self.settings)
         self.discovery_service = UrlDiscoveryService(self.settings, self.search_client)
         self.scraper_service = ScraperService(self.settings)
-        self.embedding_service = EmbeddingService(self.settings)
-        self.semantic_filter_service = SemanticFilterService(
-            self.settings,
-            self.embedding_service,
-        )
 
     def run(
         self,
@@ -53,9 +43,6 @@ class WebDoMinerPipeline:
         failed_output_file: str | Path | None = None,
         summary_output_file: str | Path | None = None,
     ) -> dict[str, Any]:
-        """
-        Run the full pipeline and return a structured summary dictionary.
-        """
         summary = PipelineSummary()
 
         input_path = Path(input_file) if input_file else self.settings.default_input_file
@@ -121,8 +108,15 @@ class WebDoMinerPipeline:
         self.logger.info("Scraping rejections: %d", len(scraping_rejections))
         self.logger.info("Scraping failures: %d", len(scraping_failures))
 
+        self.logger.info("Loading embedding model for semantic filtering.")
+        embedding_service = EmbeddingService(self.settings)
+        semantic_filter_service = SemanticFilterService(
+            self.settings,
+            embedding_service,
+        )
+
         self.logger.info("Running semantic filtering stage.")
-        semantic_result = self.semantic_filter_service.filter_pages(rs_text, scraped_pages)
+        semantic_result = semantic_filter_service.filter_pages(rs_text, scraped_pages)
         accepted_documents = semantic_result.accepted_documents
         semantic_rejections = semantic_result.rejected_pages
 

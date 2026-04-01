@@ -260,9 +260,9 @@ class KeywordExtractor:
             text,
             keyphrase_ngram_range=(1, 3),
             stop_words="english",
-            top_n=max(top_n * 4, 40),
-            use_maxsum=True,
-            nr_candidates=max(top_n * 6, 60),
+            top_n=max(top_n * 2, 20),
+            use_maxsum=False,
+            nr_candidates=max(top_n * 3, 30),
         )
 
         cleaned: list[KeywordCandidate] = []
