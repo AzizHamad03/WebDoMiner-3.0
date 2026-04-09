@@ -1,10 +1,13 @@
 # WebDoMiner
 
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SoftALL/WebDoMiner-3.0/blob/main/notebooks/WebDoMiner_Colab_Demo.ipynb)
+
 WebDoMiner generates a domain-specific corpus from the open web using a natural-language Requirements Specification (RS) document. It extracts meaningful keywords from the RS itself, discovers relevant public web pages, scrapes and cleans their main text, filters low-value content, and outputs a structured JSONL corpus with full source traceability.
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [Colab Demo](#colab-demo)
 - [How It Works](#how-it-works)
   - [1. Keyword Extraction](#1-keyword-extraction)
   - [2. URL Discovery](#2-url-discovery)
@@ -44,6 +47,14 @@ Instead of relying on paid APIs or closed services, the project uses fully local
 A key design goal of WebDoMiner is that the **RS document defines the domain**. The system is not limited to healthcare or any other fixed field. A healthcare RS, logistics RS, education RS, or another domain-specific RS should all drive different keyword extraction and discovery behavior from the same pipeline.
 
 The project is useful for requirements engineering, domain understanding, retrieval pipelines, corpus bootstrapping, and related NLP workflows.
+
+## Colab Demo
+
+An interactive Google Colab demo is available in:
+
+`notebooks/WebDoMiner_Colab_Demo.ipynb`
+
+The notebook demonstrates the project end to end using the packaged CLI and previews the generated accepted, rejected, failed, and summary outputs in a reviewer-friendly format.
 
 ## How It Works
 
@@ -107,6 +118,8 @@ webdominer 3.0/
 │   ├── input/
 │   └── output/
 ├── examples/
+├── notebooks/
+│   └── WebDoMiner_Colab_Demo.ipynb
 ├── tests/
 ├── webdominer/
 │   ├── __init__.py
@@ -303,13 +316,19 @@ The `examples/` folder contains a sample input RS file and example output files 
 
 Included files demonstrate:
 
--   a sample requirements document used as pipeline input
--   a summary of a completed run
--   accepted corpus output in JSONL format
--   rejected pages output
--   failed pages output
+- a sample requirements document used as pipeline input
+- a summary of a completed run
+- accepted corpus output in JSONL format
+- rejected pages output
+- failed pages output
 
 The current example set uses a logistics RS to show that WebDoMiner is not limited to healthcare or any other fixed domain. The pipeline is designed to be domain-neutral and driven by the RS document itself, so different RS documents should lead to different keyword extraction, search queries, and discovered content.
+
+For an interactive end-to-end demonstration, see:
+
+`notebooks/WebDoMiner_Colab_Demo.ipynb`
+
+The Colab notebook shows how to install the project, run the pipeline on the sample RS, and inspect the generated output files directly in a notebook environment.
 
 ## Testing
 
