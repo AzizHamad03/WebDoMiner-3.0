@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 import requests
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 
 from webdominer.models import SearchResult
 from webdominer.settings import Settings
@@ -33,7 +33,7 @@ class BaseSearchClient(ABC):
 
 class DuckDuckGoSearchClient(BaseSearchClient):
     """
-    Search backend using duckduckgo-search.
+    Search backend using  DDGS.
     """
 
     def search(
@@ -46,7 +46,7 @@ class DuckDuckGoSearchClient(BaseSearchClient):
 
         with DDGS() as ddgs:
             raw_items = ddgs.text(
-                keywords=query,
+                query=query,
                 max_results=max_results,
             )
 

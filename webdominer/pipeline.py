@@ -81,7 +81,10 @@ class WebDoMinerPipeline:
         configure_logging(self.settings)
         self.logger = get_logger(__name__)
 
-        self.keyword_extractor = KeywordExtractor()
+        self.embedding_service = EmbeddingService(self.settings)
+        self.keyword_extractor = KeywordExtractor(
+            model_name=self.settings.embedding_model_name
+        )
         self.query_builder = QueryBuilder()
         self.search_client = create_search_client(self.settings)
         self.discovery_service = UrlDiscoveryService(self.settings, self.search_client)
@@ -124,6 +127,10 @@ class WebDoMinerPipeline:
 
         rs_text = load_rs_text(input_path)
 
+        # Reuse the shared embedding model for KeyBERT so the sentence-transformer
+        # model is not loaded a second time.
+        self.keyword_extractor.backend_model = self.embedding_service.model
+
         self.logger.info("Extracting keywords.")
         keyword_candidates = self.keyword_extractor.extract_keywords(
             rs_text,
@@ -161,10 +168,9 @@ class WebDoMinerPipeline:
         self.logger.info("Scraping failures: %d", len(scraping_failures))
 
         self.logger.info("Loading embedding model for semantic filtering.")
-        embedding_service = EmbeddingService(self.settings)
         semantic_filter_service = SemanticFilterService(
             self.settings,
-            embedding_service,
+            self.embedding_service,
         )
 
         self.logger.info("Running semantic filtering stage.")

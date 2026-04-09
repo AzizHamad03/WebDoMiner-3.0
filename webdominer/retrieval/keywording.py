@@ -257,8 +257,26 @@ class KeywordExtractor:
     def __init__(
         self,
         model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        backend_model: object | None = None,
     ) -> None:
-        self.model = KeyBERT(model=model_name)
+        self.model_name = model_name
+        self.backend_model = backend_model
+        self._model: KeyBERT | None = None
+
+    @property
+    def model(self) -> KeyBERT:
+        """
+        Create the KeyBERT model lazily and reuse it.
+
+        If a backend embedding model is provided, reuse it instead of
+        letting KeyBERT create a separate SentenceTransformer instance.
+        """
+        if self._model is None:
+            if self.backend_model is not None:
+                self._model = KeyBERT(model=self.backend_model)
+            else:
+                self._model = KeyBERT(model=self.model_name)
+        return self._model
 
     def extract_keywords(self, text: str, top_n: int = 20) -> list[KeywordCandidate]:
         """

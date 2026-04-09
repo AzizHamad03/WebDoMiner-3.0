@@ -23,12 +23,21 @@ class EmbeddingService:
     """
     Local embedding service built on SentenceTransformers.
 
-    This service loads the model once and reuses it across the pipeline.
+    The model is loaded lazily and then reused across the pipeline.
     """
 
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
-        self.model = SentenceTransformer(settings.embedding_model_name)
+        self._model: SentenceTransformer | None = None
+
+    @property
+    def model(self) -> SentenceTransformer:
+        """
+        Load the embedding model only on first use, then reuse it.
+        """
+        if self._model is None:
+            self._model = SentenceTransformer(self.settings.embedding_model_name)
+        return self._model
 
     def embed_text(self, text: str) -> np.ndarray:
         """
